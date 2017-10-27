@@ -1,0 +1,4 @@
+.terraform/
+crash.log
+provider.log
+terraform-provider-tarmak

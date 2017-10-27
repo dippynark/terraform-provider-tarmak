@@ -2,11 +2,13 @@ package tarmak
 
 import (
 	"fmt"
+	"net/rpc"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourceVaultInitToken() *schema.Resource {
+func resourceVaultInitToken(client *rpc.Client) *schema.Resource {
+
 	return &schema.Resource{
 		Create: resourceVaultInitTokenCreateOrUpdate,
 		Read:   resourceVaultInitTokenRead,
