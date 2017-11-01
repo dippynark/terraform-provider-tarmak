@@ -1,43 +1,19 @@
 package tarmak
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"net/rpc"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/arm/resources/resources"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-
-	"github.com/jetstack/terraform-provider-tarmak/pkg/faketarmak"
 )
 
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
-
-	client, err := waitForConnection()
-	if err != nil {
-		panic(err)
-	}
-
-	var token faketarmak.Result
-	args := &faketarmak.Args{
-		Cluster: "cluster",
-		Env:     "env",
-		Role:    "role",
-		//Cluster: p.Schema["cluster"].GoString(),
-		//Env:     p.Schema["environment"].GoString(),
-		//Role:    p.Schema["role"].Type.String(),
-	}
-	err = client.Call("InitToken.TarmakInitToken", args, &token)
-	if err != nil {
-		panic(err)
-	}
 
 	var p *schema.Provider
 	p = &schema.Provider{
@@ -54,7 +30,7 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"tarmak_vault_init_token": resourceVaultInitToken(client),
+			"tarmak_vault_init_token": resourceVaultInitToken(),
 			//"tarmak_vault_kubernetes_cluster": resourceVaultKubernetesCluster(),
 		},
 	}
@@ -62,13 +38,6 @@ func Provider() terraform.ResourceProvider {
 	p.ConfigureFunc = providerConfigure(p)
 
 	return p
-}
-
-type Args struct {
-	Env     string
-	Cluster string
-	Role    string
-	Token   string
 }
 
 // Config is the configuration structure used to instantiate a
@@ -169,18 +138,4 @@ func registerAzureResourceProvidersWithSubscription(providerList []resources.Pro
 	})
 
 	return err
-}
-
-func waitForConnection() (client *rpc.Client, err error) {
-
-	for i := 0; i < 5; i++ {
-		client, err := rpc.DialHTTP("tcp", ":1234")
-		if err == nil {
-			return client, nil
-		}
-
-		time.Sleep(time.Second * 2)
-	}
-
-	return nil, errors.New("Could not reslove rpc connection")
 }

@@ -1,13 +1,13 @@
 package faketarmak
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/rpc"
 )
 
 type InitToken string
-type Result string
 
 type Args struct {
 	Env     string
@@ -15,8 +15,8 @@ type Args struct {
 	Role    string
 }
 
-func (i *InitToken) TarmakInitToken(args *Args, resp *Result) error {
-	*resp = "This is an init token"
+func (i *InitToken) TarmakInitToken(args *Args, resp *InitToken) error {
+	*resp = InitToken(fmt.Sprintf("token-%s-%s-%s", args.Cluster, args.Env, args.Role))
 	return nil
 }
 
