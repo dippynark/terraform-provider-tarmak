@@ -16,7 +16,7 @@ func resourceVaultInitToken() *schema.Resource {
 		Create: resourceVaultInitTokenCreateOrUpdate,
 		Read:   resourceVaultInitTokenRead,
 		Update: resourceVaultInitTokenCreateOrUpdate,
-		Delete: resourceVaultInitTokenDelete,
+		Delete: schema.RemoveFromState,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -73,15 +73,13 @@ func resourceVaultInitTokenCreateOrUpdate(d *schema.ResourceData, meta interface
 		return err
 	}
 
-	d.Partial(true)
 	if err := d.Set("init_token", string(token)); err != nil {
 		return err
 	}
-	d.SetPartial("init_token")
-	d.Partial(false)
 
-	//role := d.Get("role").(string)
-	//return fmt.Errorf("not implemented: role=%s", role)
+	// TODO !!!: use a hash of the token here
+	d.SetId(string(token))
+
 	return nil
 }
 
