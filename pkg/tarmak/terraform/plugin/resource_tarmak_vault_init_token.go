@@ -2,14 +2,51 @@ package tarmak
 
 import (
 	"crypto/sha1"
-	"errors"
 	"fmt"
+	"io"
 	"net/rpc"
+	"os"
 	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/jetstack/terraform-provider-tarmak/pkg/faketarmak"
 )
+
+type multiCloser struct {
+	closers []io.Closer
+}
+
+func (mc multiCloser) Close() error {
+	var err error
+	for _, c := range mc.closers {
+		if closeErr := c.Close(); closeErr != nil && err == nil {
+			err = closeErr
+		}
+	}
+	return err
+}
+
+type procCloser struct {
+	*os.Process
+}
+
+func (pc procCloser) Close() error {
+	if pc.Process == nil {
+		os.Exit(0)
+		return nil
+	}
+	c := make(chan error, 1)
+	go func() { _, err := pc.Process.Wait(); c <- err }()
+	if err := pc.Process.Signal(os.Interrupt); err != nil {
+		return err
+	}
+	select {
+	case err := <-c:
+		return err
+	case <-time.After(1 * time.Second):
+		return pc.Process.Kill()
+	}
+	return nil
+}
 
 func resourceVaultInitToken() *schema.Resource {
 
@@ -52,28 +89,37 @@ func resourceVaultInitToken() *schema.Resource {
 
 func resourceVaultInitTokenCreateOrUpdate(d *schema.ResourceData, meta interface{}) error {
 
-	client, err := waitForConnection()
-	if err != nil {
+	client := rpc.NewClient(struct {
+		io.Reader
+		io.Writer
+		io.Closer
+	}{os.Stdin, os.Stdout,
+		multiCloser{[]io.Closer{os.Stdout, os.Stdin, procCloser{}}},
+	})
+
+	//var token faketarmak.InitToken
+
+	cluster := d.Get("cluster").(string)
+	//env := d.Get("environment").(string)
+	//role := d.Get("role").(string)
+	var token *string
+	//args := &faketarmak.InitTokenArgs{
+	//	Cluster: d.Get("cluster").(string),
+	//	Env:     d.Get("environment").(string),
+	//	Role:    d.Get("role").(string),
+	//}
+	if err := client.Call("Hook", cluster, &token); err != nil {
 		return err
 	}
 
-	var token faketarmak.InitToken
+	panic(*token)
 
-	args := &faketarmak.InitTokenArgs{
-		Cluster: d.Get("cluster").(string),
-		Env:     d.Get("environment").(string),
-		Role:    d.Get("role").(string),
-	}
-	if err := client.Call("InitToken.TarmakInitToken", args, &token); err != nil {
-		return err
-	}
-
-	if err := d.Set("init_token", string(token)); err != nil {
+	if err := d.Set("init_token", *token); err != nil {
 		return err
 	}
 
 	h := sha1.New()
-	if _, err := h.Write([]byte(token)); err != nil {
+	if _, err := h.Write([]byte(*token)); err != nil {
 		return fmt.Errorf("failed to hash init token: %v", token)
 	}
 
@@ -96,15 +142,23 @@ func resourceVaultInitTokenDelete(d *schema.ResourceData, meta interface{}) erro
 	return fmt.Errorf("not implemented: role=%s", role)
 }
 
-func waitForConnection() (client *rpc.Client, err error) {
-	for i := 0; i < 5; i++ {
-		client, err := rpc.DialHTTP("tcp", ":1234")
-		if err == nil {
-			return client, nil
-		}
-
-		time.Sleep(time.Second * time.Duration(i*2))
-	}
-
-	return nil, errors.New("Could not reslove rpc connection")
-}
+//func getClient() *rpc.Client {
+//	return rpc.NewClient(struct {
+//		io.Reader
+//		io.Writer
+//		io.Closer
+//	}{os.Stdin, os.Stdout,
+//		multiCloser{[]io.Closer{os.Stdout, os.Stdin, procCloser{}}},
+//	})
+//	//for i := 0; i < 5; i++ {
+//
+//	//	client, err := rpc.DialHTTP("tcp", ":1234")
+//	//	if err == nil {
+//	//		return client, nil
+//	//	}
+//
+//	//	time.Sleep(time.Second * time.Duration(i*2))
+//	//}
+//
+//	//return nil, errors.New("Could not reslove rpc connection")
+//}
