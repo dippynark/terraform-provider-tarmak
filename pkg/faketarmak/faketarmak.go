@@ -9,13 +9,13 @@ import (
 
 type InitToken string
 
-type Args struct {
+type InitTokenArgs struct {
 	Env     string
 	Cluster string
 	Role    string
 }
 
-func (i *InitToken) TarmakInitToken(args *Args, resp *InitToken) error {
+func (i *InitToken) TarmakInitToken(args *InitTokenArgs, resp *InitToken) error {
 	*resp = InitToken(fmt.Sprintf("token-%s-%s-%s", args.Cluster, args.Env, args.Role))
 	return nil
 }

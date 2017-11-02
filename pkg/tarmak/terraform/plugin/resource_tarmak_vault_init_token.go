@@ -1,6 +1,7 @@
 package tarmak
 
 import (
+	"crypto/sha1"
 	"errors"
 	"fmt"
 	"net/rpc"
@@ -49,12 +50,6 @@ func resourceVaultInitToken() *schema.Resource {
 	return r
 }
 
-type Args struct {
-	Env     string
-	Cluster string
-	Role    string
-}
-
 func resourceVaultInitTokenCreateOrUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	client, err := waitForConnection()
@@ -64,7 +59,7 @@ func resourceVaultInitTokenCreateOrUpdate(d *schema.ResourceData, meta interface
 
 	var token faketarmak.InitToken
 
-	args := &faketarmak.Args{
+	args := &faketarmak.InitTokenArgs{
 		Cluster: d.Get("cluster").(string),
 		Env:     d.Get("environment").(string),
 		Role:    d.Get("role").(string),
@@ -77,15 +72,23 @@ func resourceVaultInitTokenCreateOrUpdate(d *schema.ResourceData, meta interface
 		return err
 	}
 
-	// TODO !!!: use a hash of the token here
-	d.SetId(string(token))
+	h := sha1.New()
+	if _, err := h.Write([]byte(token)); err != nil {
+		return fmt.Errorf("failed to hash init token: %v", token)
+	}
+
+	id := fmt.Sprintf("%x", h.Sum(nil))
+	d.SetId(id)
 
 	return nil
 }
 
 func resourceVaultInitTokenRead(d *schema.ResourceData, meta interface{}) error {
 	role := d.Get("role").(string)
-	return fmt.Errorf("not implemented: role=%s", role)
+	if role == "" {
+		return fmt.Errorf("Role must be configured for the Tarmak provider")
+	}
+	return nil
 }
 
 func resourceVaultInitTokenDelete(d *schema.ResourceData, meta interface{}) error {
