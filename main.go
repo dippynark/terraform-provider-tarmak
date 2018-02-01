@@ -1,13 +1,12 @@
 package main
 
 import (
+	tarmak "github.com/dippynark/terraform-provider-tarmak/pkg/tarmak/terraform/plugin"
 	"github.com/hashicorp/terraform/plugin"
-	"github.com/jetstack/terraform-provider-tarmak/pkg/faketarmak"
-	tarmak "github.com/jetstack/terraform-provider-tarmak/pkg/tarmak/terraform/plugin"
 )
 
 func main() {
-	go faketarmak.FakeTarmak()
+	//go faketarmak.FakeTarmak()
 
 	plugin.Serve(&plugin.ServeOpts{
 		ProviderFunc: tarmak.Provider})

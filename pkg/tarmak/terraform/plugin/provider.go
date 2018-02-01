@@ -31,6 +31,7 @@ func Provider() terraform.ResourceProvider {
 
 		ResourcesMap: map[string]*schema.Resource{
 			"tarmak_vault_init_token": resourceVaultInitToken(),
+			"tarmak_tunnel":           resourceTarmakTunnel(),
 			//"tarmak_vault_kubernetes_cluster": resourceVaultKubernetesCluster(),
 		},
 	}
