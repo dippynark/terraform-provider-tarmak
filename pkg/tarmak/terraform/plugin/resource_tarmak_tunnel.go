@@ -87,7 +87,7 @@ func resourceTarmakTunnelCreate(d *schema.ResourceData, meta interface{}) error 
 
 	sshConfigHost := d.Get("ssh_config_host").(string)
 
-	// build command
+	// build tunnel command
 	args := []string{
 		"ssh",
 		"-F",
@@ -112,7 +112,7 @@ func resourceTarmakTunnelCreate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceTarmakTunnelRead(d *schema.ResourceData, meta interface{}) error {
 
-	// retreive PID
+	// retreive tunnel process
 	process, err := getProcessFromID(d.Id())
 	if err != nil {
 		// asume dead tunnel
@@ -142,7 +142,7 @@ func resourceTarmakTunnelDelete(d *schema.ResourceData, meta interface{}) error 
 
 	// signal process
 	if err := process.Signal(syscall.SIGTERM); err != nil {
-		// assume signal failed because of dead tunnel
+		// assume dead tunnel
 		return nil
 	}
 
