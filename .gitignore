@@ -2,4 +2,5 @@
 crash.log
 provider.log
 terraform-provider-tarmak
+faketarmak
 terraform.tf*

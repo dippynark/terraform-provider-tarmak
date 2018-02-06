@@ -71,7 +71,7 @@ func resourceTarmakTunnelCreate(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return err
 	}
-	d.Set("bindPort", bindPort)
+	d.Set("bind_port", bindPort)
 
 	destinationAddress, err := getHostByName(d.Get("destination_address").(string))
 	if err != nil {
