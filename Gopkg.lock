@@ -21,12 +21,6 @@
   version = "v8.1.1"
 
 [[projects]]
-  name = "github.com/Sirupsen/logrus"
-  packages = ["."]
-  revision = "d682213848ed68c0a260ca37d6dd5ace8423f5ba"
-  version = "v1.0.4"
-
-[[projects]]
   name = "github.com/apparentlymart/go-cidr"
   packages = ["cidr"]
   revision = "7e4b007599d4e2076d9a81be723b3912852dda2c"
@@ -164,12 +158,6 @@
   revision = "d1caa6c97c9fc1cc9e83bbe34d0603f9ff0ce8bd"
 
 [[projects]]
-  name = "github.com/jetstack/tarmak"
-  packages = ["pkg/tarmak/utils"]
-  revision = "e8d9b8a284e75771fe4aae8ca9fdc6eaf06bf965"
-  version = "0.2.1"
-
-[[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   revision = "bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d"
@@ -209,20 +197,13 @@
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
-    "blowfish",
-    "ssh/terminal"
+    "blowfish"
   ]
   revision = "9477e0b78b9ac3d0b03822fd95422e2fe07627cd"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/sys"
-  packages = ["unix"]
-  revision = "3dbebcf8efb6a5011a60c2b4591c1022a759af8a"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bf5082ff1f5fc35361b88aec2c65115031dcc98b385029778c3d9cc3ae845075"
+  inputs-digest = "5602836e49ff015fc0d255fe868c4d57c8e2e686bad9297753d6d479f88abc37"
   solver-name = "gps-cdcl"
   solver-version = 1
