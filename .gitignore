@@ -1,6 +1,6 @@
 .terraform/
 crash.log
 provider.log
-terraform-provider-tarmak
-faketarmak
+/terraform-provider-tarmak
+/faketarmak
 terraform.tf*
