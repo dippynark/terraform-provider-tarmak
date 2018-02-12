@@ -28,7 +28,7 @@ func dataSourceTarmakVaultInstanceRoleRead(d *schema.ResourceData, meta interfac
 
 	var args = ""
 	var status string
-	if err := client.Call(fmt.Sprintf("%s.VaultInstanceRole", serverName), args, &status); err != nil {
+	if err := client.Call(fmt.Sprintf("%s.VaultInstanceRoleStatus", serverName), args, &status); err != nil {
 		return err
 	}
 

@@ -11,6 +11,11 @@ func dataSourceTarmakVaultCluster() *schema.Resource {
 		Read: dataSourceTarmakVaultClusterRead,
 
 		Schema: map[string]*schema.Schema{
+			"instances": {
+				Type:     schema.TypeList,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"status": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -21,15 +26,20 @@ func dataSourceTarmakVaultCluster() *schema.Resource {
 
 func dataSourceTarmakVaultClusterRead(d *schema.ResourceData, meta interface{}) error {
 
+	instanceInterfaces := d.Get("instances").([]interface{})
+	instances := []string{}
+	for _, instancesInterface := range instanceInterfaces {
+		instances = append(instances, instancesInterface.(string))
+	}
+
 	client, err := newClient()
 	if err != nil {
 		d.SetId("")
 		return err
 	}
 
-	var args = ""
 	var status string
-	if err := client.Call(fmt.Sprintf("%s.VaultStatus", serverName), args, &status); err != nil {
+	if err := client.Call(fmt.Sprintf("%s.VaultClusterStatus", serverName), instances, &status); err != nil {
 		d.SetId("")
 		return err
 	}

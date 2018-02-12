@@ -11,6 +11,11 @@ func dataSourceTarmakBastionInstance() *schema.Resource {
 		Read: dataSourceTarmakBastionInstanceRead,
 
 		Schema: map[string]*schema.Schema{
+			"hostname": {
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
 			"status": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -27,9 +32,8 @@ func dataSourceTarmakBastionInstanceRead(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	var args = ""
 	var status string
-	if err := client.Call(fmt.Sprintf("%s.BastionStatus", serverName), args, &status); err != nil {
+	if err := client.Call(fmt.Sprintf("%s.BastionInstanceStatus", serverName), d.Get("hostname").(string), &status); err != nil {
 		d.SetId("")
 		return err
 	}
