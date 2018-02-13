@@ -51,7 +51,7 @@ func dataSourceTarmakBastionInstanceRead(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	id := "bastioninstance"
+	id := fmt.Sprintf("%s-%s", hostname, username)
 	d.SetId(id)
 
 	return nil

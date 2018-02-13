@@ -47,7 +47,8 @@ func dataSourceTarmakVaultInstanceRoleRead(d *schema.ResourceData, meta interfac
 		return err
 	}
 
-	d.SetId(initToken)
+	id := fmt.Sprintf("%s-%s", vaultClusterName, roleName)
+	d.SetId(id)
 
 	return nil
 }
