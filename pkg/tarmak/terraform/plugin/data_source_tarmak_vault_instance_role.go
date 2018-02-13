@@ -19,7 +19,7 @@ func dataSourceTarmakVaultInstanceRole() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"status": {
+			"init_token": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -38,17 +38,16 @@ func dataSourceTarmakVaultInstanceRoleRead(d *schema.ResourceData, meta interfac
 	}
 
 	var args = [2]string{vaultClusterName, roleName}
-	var status string
-	if err := client.Call(fmt.Sprintf("%s.VaultInstanceRoleStatus", serverName), args, &status); err != nil {
+	var initToken string
+	if err := client.Call(fmt.Sprintf("%s.VaultInstanceRoleStatus", serverName), args, &initToken); err != nil {
 		return err
 	}
 
-	if err := d.Set("status", status); err != nil {
+	if err := d.Set("init_token", initToken); err != nil {
 		return err
 	}
 
-	id := "vaultinstancerole"
-	d.SetId(id)
+	d.SetId(initToken)
 
 	return nil
 }
