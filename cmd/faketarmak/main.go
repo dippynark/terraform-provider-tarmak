@@ -11,13 +11,9 @@ import (
 	"syscall"
 )
 
-type RPC interface {
-	BastionStatus(args string, reply *string) error
-}
+type tarmakRPC struct{}
 
-type initTokenRPC struct{}
-
-func (i *initTokenRPC) BastionStatus(args string, reply *string) error {
+func (i *tarmakRPC) BastionStatus(args string, reply *string) error {
 	fmt.Printf("BastionStatus called\n")
 	*reply = "running"
 	return nil
@@ -52,7 +48,7 @@ func main() {
 func accept(conn net.Conn) {
 
 	s := rpc.NewServer()
-	s.RegisterName("Tarmak", &initTokenRPC{})
+	s.RegisterName("Tarmak", &tarmakRPC{})
 
 	fmt.Printf("Connection made\n")
 
