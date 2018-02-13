@@ -13,44 +13,48 @@ provider "tarmak" {
   cluster     = "${var.cluster}"
 }
 
-resource "tarmak_bastion_instance" "bastion" {  
+data "tarmak_bastion_instance" "bastion" {  
+  hostname = "bastion"
+  username = "root"
 }
 
 output "bastion_status" {
-  value = "${tarmak_bastion_instance.bastion.status}"
+  value = "${data.tarmak_bastion_instance.bastion.status}"
 }
 
-
-/*
-
-resource "tarmak_tunnel" "test" {
-  bind_address = "127.0.0.1"
-  #destination_address = "google.com"
-  destination_address = "216.58.206.110"
-  destination_port = 80
-  ssh_config_path = "/Users/luke/.ssh/config"
-  ssh_config_host = "home"
+data "tarmak_vault_cluster" "vault" {
+  instances = ["ip-10-99-32-12.us-west-1.compute.internal",
+		"ip-10-99-32-11.us-west-1.compute.internal",
+		"ip-10-99-32-10.us-west-1.compute.internal"]
 }
 
-output "bind_port" {
-  value = "${tarmak_tunnel.test.bind_port}"
+output "vault_status" {
+  value = "${data.tarmak_vault_cluster.vault.status}"
 }
 
-
-variable "role" {
-    type = "string"
-    default = "worker"
+data "tarmak_vault_instance_role" "etcd" {
+  vault_cluster_name = "vault"
+  role_name = "etcd" 
 }
 
-resource "tarmak_vault_init_token" "worker" {
-  environment = "${var.environment}"
-  cluster     = "${var.cluster}"
-  role        = "${var.role}"
+data "tarmak_vault_instance_role" "master" {
+  vault_cluster_name = "vault"
+  role_name = "master" 
 }
 
-resource "null_resource" "worker_token_to_file" {
-  provisioner "local-exec" {
-    command = "echo ${tarmak_vault_init_token.worker.init_token} >> token_test.txt"
-  }
+data "tarmak_vault_instance_role" "worker" {
+  vault_cluster_name = "vault"
+  role_name = "worker" 
 }
-*/
+
+output "vault_instance_role_etcd_status" {
+  value = "${data.tarmak_vault_instance_role.etcd.status}"
+}
+
+output "vault_instance_role_master_status" {
+  value = "${data.tarmak_vault_instance_role.master.status}"
+}
+
+output "vault_instance_role_worker_status" {
+  value = "${data.tarmak_vault_instance_role.worker.status}"
+}
