@@ -39,6 +39,7 @@ func Provider() terraform.ResourceProvider {
 			"tarmak_vault_instances_role": dataSourceTarmakVaultInstanceRole(),
 			"tarmak_bastion_instance":     dataSourceTarmakBastionInstance(),
 			"tarmak_vault_cluster":        dataSourceTarmakVaultCluster(),
+			"tarmak_vault_instance_role":  dataSourceTarmakVaultInstanceRole(),
 		},
 	}
 
